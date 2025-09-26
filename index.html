@@ -17,7 +17,7 @@
             <button id="sidebarToggle" class="sidebar-handle" aria-label="Toggle sidebar">☰</button>
 
             <div class="sidebar-inner">
-                <h2>Budgets</h2>
+                <h2>Sheets</h2>
 
                 <ul id="budgetTabs"></ul>
 
@@ -258,6 +258,17 @@
                     <button id="saveSheetBtn" class="btn">Save</button>
                     <button id="cancelSheetBtn" class="btn btn-danger">Cancel</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Are you sure you want to delete this sheet?</h3>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+                <button id="cancelDeleteBtn" class="btn">Cancel</button>
             </div>
         </div>
     </div>
