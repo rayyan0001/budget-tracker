@@ -202,8 +202,9 @@ function renderSidebar() {
         const li = document.createElement("li");
         li.dataset.key = key;
         li.className = key === currentBudgetKey ? "active" : "";
-        li.style.borderLeft = `6px solid ${budgets[key].color || "#667eea"}`;
-
+        li.style.background = budgets[key].color || "#667eea";
+        li.style.color = "white"; 
+        
         // Normal click loads the sheet
         li.onclick = () => {
             if (!editMode) loadBudget(key);
