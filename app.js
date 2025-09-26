@@ -1,14 +1,55 @@
 // Data storage
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+let budgets = JSON.parse(localStorage.getItem("budgets")) || {
+  "budget_1": { name: "New Sheet 1", transactions: [], accounts: [] }
+};
+let currentBudgetKey = "budget_1";
 
 // Initialize dates to today
 document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
 document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
 
+// Write into current budget sheet instead of global
 function saveData() {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+  budgets[currentBudgetKey].transactions = transactions;
+  budgets[currentBudgetKey].accounts = accounts;
+  localStorage.setItem("budgets", JSON.stringify(budgets));
+}
+
+// Whenever switching budget sheets, load from it
+function loadBudget(key) {
+  currentBudgetKey = key;
+  transactions = budgets[key].transactions || [];
+  accounts = budgets[key].accounts || [];
+  updateDisplay();
+  updateAccountsDisplay();
+}
+
+// Add new sheet (current local max set to 5)
+function addBudget() {
+  if (Object.keys(budgets).length >= 5) {
+    alert("Maximum of 5 budgets reached.");
+    return;
+  }
+  let newKey = "budget_" + Date.now();
+  budgets[newKey] = { name: "New Sheet", transactions: [], accounts: [] };
+  saveData();
+  renderSidebar();
+  loadBudget(newKey);
+}
+
+// Refresh the sidebar
+function renderSidebar() {
+  const list = document.getElementById("budgetTabs");
+  list.innerHTML = "";
+  for (let key in budgets) {
+    let li = document.createElement("li");
+    li.textContent = budgets[key].name;
+    if (key === currentBudgetKey) li.classList.add("active");
+    li.onclick = () => loadBudget(key);
+    list.appendChild(li);
+  }
 }
 
 // Tab switching
@@ -92,6 +133,7 @@ function addExpense() {
         };
         
         transactions.push(transaction);
+        saveData();
         
         // Clear fields
         document.getElementById('expenseDesc').value = '';
@@ -136,6 +178,8 @@ function addAccount() {
         
         updateAccountsDisplay();
         updateDisplay(); // Update balance check
+        saveData();
+
     } else {
         alert('Please enter account name and amount!');
     }
@@ -146,12 +190,14 @@ function deleteTransaction(id) {
     transactions = transactions.filter(transaction => transaction.id !== id);
     updateDisplay();
     updateReportsDisplay();
+    saveData();
 }
 
 function deleteAccount(id) {
     accounts = accounts.filter(account => account.id !== id);
     updateAccountsDisplay();
     updateDisplay();
+    saveData();
 }
 
 // Update main display
@@ -339,5 +385,5 @@ function applyFilters() {
 }
 
 // Initialize the app
-updateDisplay();
-updateAccountsDisplay();
+renderSidebar();
+loadBudget(currentBudgetKey)
