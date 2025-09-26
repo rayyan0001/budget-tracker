@@ -46,8 +46,25 @@ function renderSidebar() {
   for (let key in budgets) {
     let li = document.createElement("li");
     li.textContent = budgets[key].name;
+
     if (key === currentBudgetKey) li.classList.add("active");
     li.onclick = () => loadBudget(key);
+
+    // Add rename button
+    let renameBtn = document.createElement("button");
+    renameBtn.textContent = "✏️";
+    renameBtn.style.marginLeft = "10px";
+    renameBtn.onclick = (e) => {
+      e.stopPropagation(); // don’t trigger loadBudget
+      let newName = prompt("Enter new name:", budgets[key].name);
+      if (newName) {
+        budgets[key].name = newName;
+        saveData();
+        renderSidebar();
+      }
+    };
+
+    li.appendChild(renameBtn);
     list.appendChild(li);
   }
 }
@@ -383,6 +400,12 @@ function applyFilters() {
         listElement.appendChild(item);
     });
 }
+
+document.getElementById("addBudgetBtn").addEventListener("click", addBudget);
+
+document.getElementById("toggleSidebar").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("active");
+});
 
 // Initialize the app
 renderSidebar();
