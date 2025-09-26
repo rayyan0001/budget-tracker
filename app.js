@@ -1,10 +1,15 @@
 // Data storage
-let transactions = [];
-let accounts = [];
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 
 // Initialize dates to today
 document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
 document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+
+function saveData() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+}
 
 // Tab switching
 function switchTab(tabName) {
@@ -52,7 +57,8 @@ function addIncome() {
         };
         
         transactions.push(transaction);
-        
+        saveData();
+
         // Clear fields
         document.getElementById('incomeDesc').value = '';
         document.getElementById('incomeAmount').value = '';
