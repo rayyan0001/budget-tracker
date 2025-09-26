@@ -547,3 +547,26 @@ textarea:focus {
 .drag-handle:active {
     cursor: grabbing;
 }
+
+/* Mobile responsive sidebar */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 80%;
+        max-width: 300px;
+        transform: translateX(-100%);
+    }
+
+    #sidebar.collapsed {
+        transform: translateX(-100%);
+    }
+
+    #sidebar:not(.collapsed) {
+        transform: translateX(0);
+    }
+
+    /* Main container takes full width on mobile */
+    .container {
+        margin-left: 0 !important;
+        max-width: 100%;
+    }
+}
