@@ -1,222 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Tracker</title>
-
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
 
     <div class="app-layout">
-        <div id="sidebar">
-        <h2>Budgets</h2>
-        <ul id="budgetTabs"></ul>
-        <button id="addBudgetBtn">+ Add Budget</button>
-        <button id="toggleSidebar" class="btn">☰</button>
-        </div>
+        <!-- Sidebar (starts collapsed but with a visible handle) -->
+        <aside id="sidebar" class="collapsed">
+            <!-- Handle that hides/shows the sidebar; always attached to the sidebar -->
+            <button id="sidebarToggle" class="sidebar-handle" aria-label="Toggle sidebar">☰</button>
 
-    <div class="container">
-        <div class="header">
-            <button id="toggleSidebar" class="btn">☰</button>
-            <h1>Budget Tracker</h1>
-            <div class="balance-check">
-                <div class="balance-amount" id="balanceCheck">$0.00</div>
-                <div class="balance-status" id="balanceStatus">Perfect Balance!</div>
-            </div>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('transactions')">Transactions</button>
-            <button class="tab" onclick="switchTab('accounts')">Cash & Accounts</button>
-            <button class="tab" onclick="switchTab('reports')">Full Report</button>
-        </div>
-        
-        <!-- Transactions Tab -->
-        <div class="tab-content active" id="transactions">
-            <div class="summary-cards">
-                <div class="card income">
-                    <h3>Total Income</h3>
-                    <div class="amount" id="totalIncome">$0.00</div>
-                </div>
-                <div class="card expenses">
-                    <h3>Total Expenses</h3>
-                    <div class="amount" id="totalExpenses">$0.00</div>
-                </div>
-                <div class="card">
-                    <h3>Net Balance</h3>
-                    <div class="amount" id="netBalance">$0.00</div>
+            <div class="sidebar-inner">
+                <h2>Budgets</h2>
+
+                <ul id="budgetTabs"></ul>
+
+                <div class="sidebar-actions">
+                    <button id="addBudgetBtn" class="btn btn-full">+ Add Tab</button>
+                    <button id="toggleEditBtn" class="btn btn-full">✏️ Edit Tabs</button>
                 </div>
             </div>
-            
-            <div class="input-section">
-                <h3>Add Income</h3>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label for="incomeDesc">Description</label>
-                        <input type="text" id="incomeDesc" placeholder="e.g., Salary, Freelance">
-                    </div>
-                    <div class="input-group">
-                        <label for="incomeAmount">Amount</label>
-                        <input type="number" id="incomeAmount" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="input-group">
-                        <label for="incomeDate">Date</label>
-                        <input type="date" id="incomeDate">
-                    </div>
-                    <div class="input-group">
-                        <label for="incomeLocation">Location</label>
-                        <input type="text" id="incomeLocation" placeholder="e.g., Company Name">
-                    </div>
-                    <div class="input-group">
-                        <button class="btn" onclick="addIncome()">Add Income</button>
-                    </div>
-                </div>
+        </aside>
+
+        <!-- Main App -->
+        <div class="container">
+
+            <!-- Blank state (hidden until no sheets exist) -->
+            <div id="blankState" style="display:none; padding:40px; text-align:center; color:#6c757d;">
+                <h2 style="margin-bottom:20px;">No sheets available</h2>
+                <p style="margin-bottom:20px;">Start by creating a new sheet to track your budget.</p>
+                <button class="btn" onclick="addBudget()">+ Add New Sheet</button>
             </div>
-            
-            <div class="input-section">
-                <h3>Add Expense</h3>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label for="expenseDesc">Description</label>
-                        <input type="text" id="expenseDesc" placeholder="e.g., Groceries, Rent">
-                    </div>
-                    <div class="input-group">
-                        <label for="expenseCategory">Category</label>
-                        <select id="expenseCategory">
-                            <option value="Food">Food</option>
-                            <option value="Housing">Housing</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Utilities">Utilities</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="expenseAmount">Amount</label>
-                        <input type="number" id="expenseAmount" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="input-group">
-                        <label for="expenseDate">Date</label>
-                        <input type="date" id="expenseDate">
+
+            <!-- Full App Content -->
+            <div id="appContent">
+                <div class="header">
+                    <h1 id="sheetTitle">Sheet: Budget Tracker</h1>
+                    <div class="balance-check">
+                        <div class="balance-amount" id="balanceCheck">$0.00</div>
+                        <div class="balance-status" id="balanceStatus">Perfect Balance!</div>
                     </div>
                 </div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label for="expenseLocation">Location</label>
-                        <input type="text" id="expenseLocation" placeholder="e.g., Store Name, Restaurant">
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('transactions')">Transactions</button>
+                    <button class="tab" onclick="switchTab('accounts')">Cash & Accounts</button>
+                    <button class="tab" onclick="switchTab('reports')">Full Report</button>
+                </div>
+
+                <!-- Transactions Tab -->
+                <div class="tab-content active" id="transactions">
+                    <div class="summary-cards">
+                        <div class="card income">
+                            <h3>Total Income</h3>
+                            <div class="amount" id="totalIncome">$0.00</div>
+                        </div>
+                        <div class="card expenses">
+                            <h3>Total Expenses</h3>
+                            <div class="amount" id="totalExpenses">$0.00</div>
+                        </div>
+                        <div class="card">
+                            <h3>Net Balance</h3>
+                            <div class="amount" id="netBalance">$0.00</div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="expenseNotes">Notes (Optional)</label>
-                        <textarea id="expenseNotes" placeholder="Any additional details..."></textarea>
+
+                    <div class="input-section">
+                        <h3>Add Income</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="incomeDesc">Description</label>
+                                <input type="text" id="incomeDesc" placeholder="e.g., Salary, Freelance">
+                            </div>
+                            <div class="input-group">
+                                <label for="incomeAmount">Amount</label>
+                                <input type="number" id="incomeAmount" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="input-group">
+                                <label for="incomeDate">Date</label>
+                                <input type="date" id="incomeDate">
+                            </div>
+                            <div class="input-group">
+                                <label for="incomeLocation">Location</label>
+                                <input type="text" id="incomeLocation" placeholder="e.g., Company Name">
+                            </div>
+                            <div class="input-group">
+                                <button class="btn" onclick="addIncome()">Add Income</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <button class="btn" onclick="addExpense()">Add Expense</button>
+
+                    <div class="input-section">
+                        <h3>Add Expense</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="expenseDesc">Description</label>
+                                <input type="text" id="expenseDesc" placeholder="e.g., Groceries, Rent">
+                            </div>
+                            <div class="input-group">
+                                <label for="expenseCategory">Category</label>
+                                <select id="expenseCategory">
+                                    <option value="Food">Food</option>
+                                    <option value="Housing">Housing</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="expenseAmount">Amount</label>
+                                <input type="number" id="expenseAmount" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="input-group">
+                                <label for="expenseDate">Date</label>
+                                <input type="date" id="expenseDate">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="expenseLocation">Location</label>
+                                <input type="text" id="expenseLocation" placeholder="e.g., Store Name, Restaurant">
+                            </div>
+                            <div class="input-group">
+                                <label for="expenseNotes">Notes (Optional)</label>
+                                <textarea id="expenseNotes" placeholder="Any additional details..."></textarea>
+                            </div>
+                            <div class="input-group">
+                                <button class="btn" onclick="addExpense()">Add Expense</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="transactions-list">
+                        <h3 style="color:#2c3e50; margin-bottom:20px;">Recent Transactions</h3>
+                        <div id="transactionsList">
+                            <p style="text-align:center; color:#6c757d; padding:20px;">No transactions yet. Start by
+                                adding some income or expenses!</p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Cash & Accounts Tab -->
+                <div class="tab-content" id="accounts">
+                    <div class="summary-cards">
+                        <div class="card cash">
+                            <h3>Total Cash & Accounts</h3>
+                            <div class="amount" id="totalAccounts">$0.00</div>
+                        </div>
+                        <div class="card">
+                            <h3>Balance Check</h3>
+                            <div class="amount" id="balanceCheckAccounts">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="input-section">
+                        <h3>Add/Update Account</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="accountName">Account Name</label>
+                                <input type="text" id="accountName" placeholder="e.g., Cash Coins, Bank1, Wallet">
+                            </div>
+                            <div class="input-group">
+                                <label for="accountType">Type</label>
+                                <select id="accountType">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Checking">Checking Account</option>
+                                    <option value="Savings">Savings Account</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Investment">Investment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="accountAmount">Current Balance</label>
+                                <input type="number" id="accountAmount" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="input-group">
+                                <button class="btn" onclick="addAccount()">Add/Update Account</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="transactions-list">
+                        <h3 style="color:#2c3e50; margin-bottom:20px;">Your Accounts</h3>
+                        <div id="accountsList">
+                            <p style="text-align:center; color:#6c757d; padding:20px;">No accounts added yet. Start by
+                                adding your cash and bank accounts!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Report Tab -->
+                <div class="tab-content" id="reports">
+                    <div class="report-filters">
+                        <div class="input-group">
+                            <label for="filterStartDate">From Date</label>
+                            <input type="date" id="filterStartDate">
+                        </div>
+                        <div class="input-group">
+                            <label for="filterEndDate">To Date</label>
+                            <input type="date" id="filterEndDate">
+                        </div>
+                        <div class="input-group">
+                            <label for="filterCategory">Category</label>
+                            <select id="filterCategory">
+                                <option value="">All Categories</option>
+                                <option value="Income">Income</option>
+                                <option value="Food">Food</option>
+                                <option value="Housing">Housing</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <button class="btn" onclick="applyFilters()">Apply Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="transactions-list">
+                        <h3 style="color:#2c3e50; margin-bottom:20px;">Detailed Transaction Report</h3>
+                        <div id="reportsList">
+                            <p style="text-align:center; color:#6c757d; padding:20px;">No transactions to show. Add some
+                                transactions first!</p>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end of appContent -->
+
+        </div> <!-- end of container -->
+    </div> <!-- end of app-layout -->
+
+    <!-- Sheet Modal -->
+    <div id="sheetModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Sheet</h3>
+            <div class="input-group">
+                <label for="sheetName">Name</label>
+                <input type="text" id="sheetName">
             </div>
-            
-            <div class="transactions-list">
-                <h3 style="color: #2c3e50; margin-bottom: 20px;">Recent Transactions</h3>
-                <div id="transactionsList">
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">No transactions yet. Start by adding some income or expenses!</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Cash & Accounts Tab -->
-        <div class="tab-content" id="accounts">
-            <div class="summary-cards">
-                <div class="card cash">
-                    <h3>Total Cash & Accounts</h3>
-                    <div class="amount" id="totalAccounts">$0.00</div>
-                </div>
-                <div class="card">
-                    <h3>Balance Check</h3>
-                    <div class="amount" id="balanceCheckAccounts">$0.00</div>
-                </div>
-            </div>
-            
-            <div class="input-section">
-                <h3>Add/Update Account</h3>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label for="accountName">Account Name</label>
-                        <input type="text" id="accountName" placeholder="e.g., Cash Coins, Bank1, Wallet">
-                    </div>
-                    <div class="input-group">
-                        <label for="accountType">Type</label>
-                        <select id="accountType">
-                            <option value="Cash">Cash</option>
-                            <option value="Checking">Checking Account</option>
-                            <option value="Savings">Savings Account</option>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Investment">Investment</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="accountAmount">Current Balance</label>
-                        <input type="number" id="accountAmount" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="input-group">
-                        <button class="btn" onclick="addAccount()">Add/Update Account</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="transactions-list">
-                <h3 style="color: #2c3e50; margin-bottom: 20px;">Your Accounts</h3>
-                <div id="accountsList">
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">No accounts added yet. Start by adding your cash and bank accounts!</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Full Report Tab -->
-        <div class="tab-content" id="reports">
-            <div class="report-filters">
-                <div class="input-group">
-                    <label for="filterStartDate">From Date</label>
-                    <input type="date" id="filterStartDate">
-                </div>
-                <div class="input-group">
-                    <label for="filterEndDate">To Date</label>
-                    <input type="date" id="filterEndDate">
-                </div>
-                <div class="input-group">
-                    <label for="filterCategory">Category</label>
-                    <select id="filterCategory">
-                        <option value="">All Categories</option>
-                        <option value="Income">Income</option>
-                        <option value="Food">Food</option>
-                        <option value="Housing">Housing</option>
-                        <option value="Transportation">Transportation</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Shopping">Shopping</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <button class="btn" onclick="applyFilters()">Apply Filters</button>
-                </div>
-            </div>
-            
-            <div class="transactions-list">
-                <h3 style="color: #2c3e50; margin-bottom: 20px;">Detailed Transaction Report</h3>
-                <div id="reportsList">
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">No transactions to show. Add some transactions first!</p>
+            <div class="input-group">
+                <label>Choose Color</label>
+                <div id="colorChoices" class="color-choices"></div>
+                <div class="modal-actions">
+                    <button id="saveSheetBtn" class="btn">Save</button>
+                    <button id="cancelSheetBtn" class="btn btn-danger">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="app.js"></script>
+
 </body>
+
 </html>
